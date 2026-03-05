@@ -100,6 +100,38 @@ async function callDraftUserApi(phoneNumber) {
   );
 }
 
+async function callSegmentIdentify(phoneNumber, userId) {
+  if (!userId) throw new Error('userId is required for Segment identify');
+
+  // Extract last 3 digits of phone for privacy
+  const maskedPhone = phoneNumber.slice(-3) ? `7***${phoneNumber.slice(-3)}` : phoneNumber;
+
+  const body = {
+    type: 'identify',
+    traits: {
+      phone: maskedPhone
+    },
+    userId: userId,
+    writeKey: SEGMENT_WRITE_KEY
+  };
+
+  console.log('[Segment Identify] Request payload:', body);
+
+  const response = await fetch(SEGMENT_TRACK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => '');
+    console.error('[Segment Identify] API failed:', response.status, errorText);
+    throw new Error(`Segment identify API failed with status ${response.status}`);
+  }
+
+  console.log('[Segment Identify] Success status:', response.status);
+}
+
 async function callSegmentTrack(submissionPayload, userId) {
   const formData = submissionPayload?.form_data || {};
   if (!userId) throw new Error('UUID is required for Segment tracking');
@@ -165,6 +197,17 @@ export default async function handler(req, res) {
 
     console.log('[Flow] Starting DraftUser -> Segment flow');
     const uuid = await callDraftUserApi(phoneNumber);
+
+    // Step 1: Send identify event to Segment
+    try {
+      await callSegmentIdentify(phoneNumber, uuid);
+      console.log('[Flow] Segment identify event sent successfully');
+    } catch (err) {
+      console.error('[Flow] Segment identify failed:', err);
+      // Don't fail the entire flow if identify fails, just log it
+    }
+
+    // Step 2: Send track event to Segment
     await callSegmentTrack(submissionPayload, uuid);
     console.log('[Flow] DraftUser -> Segment flow completed successfully');
 
