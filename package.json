@@ -1,0 +1,27 @@
+{
+  "name": "nxtwave-form-lead",
+  "version": "1.0.0",
+  "description": "NxtWave form lead handler with OTP events",
+  "main": "server-express.cjs",
+  "type": "module",
+  "scripts": {
+    "start": "node server-express.cjs",
+    "dev": "node --watch server-express.cjs"
+  },
+  "keywords": [
+    "express",
+    "cors",
+    "form",
+    "lead"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
