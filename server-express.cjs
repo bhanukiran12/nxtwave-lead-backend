@@ -39,7 +39,7 @@ const DRAFT_USER_API_KEY = process.env.DRAFT_USER_API_KEY || 'aX6TI0JV.GD0Bz43nt
 const DRAFT_USER_CSRF_COOKIE = process.env.DRAFT_USER_CSRF_COOKIE || 'csrftoken=xNTQubRZDn4VCec5riyDHDxtEMdN4Fuh';
 
 const SEGMENT_TRACK_URL = process.env.SEGMENT_TRACK_URL || 'https://api.segment.io/v1/track';
-const SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY || 'pSF1EDPoC6XzbKeiyn2N3StqrlGdPHFT';
+const SEGMENT_API_KEY = process.env.SEGMENT_API_KEY || 'Ghu35SHftVD7AJsVsPxgwhYtCBXlHuJc';
 
 function getOrdinal(day) {
   const rem10 = day % 10;
@@ -149,7 +149,7 @@ async function callSegmentTrack(submissionPayload, userId) {
       year_of_graduation: formData.graduationYear || formData.yearOfGraduation || null
     },
     userId: userId,
-    writeKey: SEGMENT_WRITE_KEY
+    writeKey: SEGMENT_API_KEY
   };
 
   console.log('[Segment] Request payload:', body);
@@ -183,7 +183,7 @@ async function callSegmentIdentify(phoneNumber, userId) {
       phone: maskedPhone
     },
     userId: userId,
-    writeKey: SEGMENT_WRITE_KEY
+    writeKey: SEGMENT_API_KEY
   };
 
   console.log('[Segment Identify] Request payload:', body);

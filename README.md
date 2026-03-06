@@ -30,7 +30,7 @@ A Node.js/Express server handling lead registration form submissions with OTP ev
    Then edit `.env` and add your API keys:
    - `DRAFT_USER_API_KEY`
    - `DRAFT_USER_CSRF_COOKIE`
-   - `SEGMENT_WRITE_KEY`
+   - `SEGMENT_API_KEY`
 
 ## Running the Server
 
