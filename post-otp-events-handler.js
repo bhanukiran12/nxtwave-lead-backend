@@ -151,6 +151,7 @@ async function callSegmentTrack(submissionPayload, userId) {
       utm_medium: formData.utm_medium || null,
       utm_source: formData.utm_source || null,
       utm_term: formData.utm_term || null,
+      name: formData.name || null,
       year_of_graduation: formData.graduationYear || formData.yearOfGraduation || null
     },
     userId,
