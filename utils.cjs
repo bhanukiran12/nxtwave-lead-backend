@@ -20,13 +20,21 @@ function formatPreferredDate(ymd) {
 
 function formatPreferredTime(datetimeValue) {
   if (!datetimeValue) return '';
-  const [datePart, timePart] = String(datetimeValue).split(' ');
+  const rawValue = String(datetimeValue).trim();
+
+  const meridianMatch = rawValue.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (meridianMatch) {
+    const [, hh, mm, meridian] = meridianMatch;
+    return `${String(Number(hh)).padStart(2, '0')}:${mm} ${meridian.toUpperCase()}`;
+  }
+
+  const [datePart, timePart] = rawValue.split(' ');
   if (!datePart || !timePart) return '';
   const [hh, mm] = timePart.split(':').map(Number);
   if (!Number.isFinite(hh) || !Number.isFinite(mm)) return '';
   const meridian = hh >= 12 ? 'PM' : 'AM';
   const hour12 = hh % 12 || 12;
-  return `${hour12}:${String(mm).padStart(2, '0')} ${meridian}`;
+  return `${String(hour12).padStart(2, '0')}:${String(mm).padStart(2, '0')} ${meridian}`;
 }
 
 function toIsoWithIst(datetimeValue) {
