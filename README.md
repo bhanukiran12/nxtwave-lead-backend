@@ -73,6 +73,7 @@ Handles post-OTP events: registers user with Draft User API and tracks event in 
       "lead_category": "intensive_lead",
       "language": "Telugu",
       "preferred_mode": "online",
+      "state": "Telangana",
       "graduationYear": 2023,
       "utm_campaign": "campaign",
       "utm_content": "content",
