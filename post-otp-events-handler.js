@@ -110,11 +110,9 @@ async function callDraftUserApi(phoneNumber) {
 async function callSegmentIdentify(phoneNumber, userId) {
   if (!userId) throw new Error('userId is required for Segment identify');
 
-  const maskedPhone = phoneNumber.slice(-3) ? `7***${phoneNumber.slice(-3)}` : phoneNumber;
-
   const body = {
     type: 'identify',
-    traits: { phone: maskedPhone },
+    traits: { phone: phoneNumber },
     userId: userId,
     writeKey: SEGMENT_API_KEY
   };

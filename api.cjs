@@ -108,13 +108,10 @@ async function callSegmentIdentify(phoneNumber, userId) {
     throw new Error('userId is required for Segment identify');
   }
 
-  // Extract last 3 digits of phone for privacy
-  const maskedPhone = phoneNumber.slice(-3) ? `7***${phoneNumber.slice(-3)}` : phoneNumber;
-
   const body = {
     type: 'identify',
     traits: {
-      phone: maskedPhone
+      phone: phoneNumber
     },
     userId: userId,
     writeKey: SEGMENT_API_KEY
