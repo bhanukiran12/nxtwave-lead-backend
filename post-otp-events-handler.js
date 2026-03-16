@@ -43,21 +43,13 @@ function formatPreferredDate(ymd) {
 
 function formatPreferredTime(datetimeValue) {
   if (!datetimeValue) return '';
-  const rawValue = String(datetimeValue).trim();
-
-  const meridianMatch = rawValue.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-  if (meridianMatch) {
-    const [, hh, mm, meridian] = meridianMatch;
-    return `${String(Number(hh)).padStart(2, '0')}:${mm} ${meridian.toUpperCase()}`;
-  }
-
-  const [datePart, timePart] = rawValue.split(' ');
+  const [datePart, timePart] = String(datetimeValue).split(' ');
   if (!datePart || !timePart) return '';
   const [hh, mm] = timePart.split(':').map(Number);
   if (!Number.isFinite(hh) || !Number.isFinite(mm)) return '';
   const meridian = hh >= 12 ? 'PM' : 'AM';
   const hour12 = hh % 12 || 12;
-  return `${String(hour12).padStart(2, '0')}:${String(mm).padStart(2, '0')} ${meridian}`;
+  return `${hour12}:${String(mm).padStart(2, '0')} ${meridian}`;
 }
 
 function toIsoWithIst(datetimeValue) {
@@ -156,11 +148,9 @@ async function callSegmentTrack(submissionPayload, userId) {
       frontend_form_path_id: 'intensive-english',
       lead_category: formData.lead_category || 'intensive_lead',
       preferred_language: formData.language || 'Telugu',
-      state: formData.state || formData.State || formData.user_state || null,
+      preferred_mode: formData.preferred_mode || formData.preferredMode || formData.mode || null,
       user_preferred_date: formatPreferredDate(formData.selectADateToBookASlot),
-      user_preferred_time: formatPreferredTime(
-        formData.timeSlots || formData.selected_webinar_slot_datetime
-      ),
+      user_preferred_time: formData.timeSlots || formatPreferredTime(formData.selected_webinar_slot_datetime),
       utm_campaign: formData.utm_campaign || null,
       utm_content: formData.utm_content || null,
       utm_medium: formData.utm_medium || null,
@@ -223,7 +213,6 @@ export default async function handler(req, res) {
     const uuid = await callDraftUserApi(phoneNumber);
     console.log('[handler] callDraftUserApi returned uuid:', uuid);
 
-    // Step 1: Send identify event to Segment
     try {
       await callSegmentIdentify(phoneNumber, uuid);
       console.log('[Flow] Segment identify event sent successfully');
@@ -231,7 +220,6 @@ export default async function handler(req, res) {
       console.error('[Flow] Segment identify failed:', err);
     }
 
-    // Step 2: Send track event to Segment
     await callSegmentTrack(submissionPayload, uuid);
     console.log('[Flow] DraftUser -> Segment flow completed successfully');
 

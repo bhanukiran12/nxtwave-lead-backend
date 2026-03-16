@@ -55,7 +55,6 @@ app.post('/api/post-otp-events', async (req, res) => {
       return res.status(502).json({ ok: false, error: 'Draft user API failed. UUID not available.' });
     }
 
-    // Step 1: Send identify event to Segment
     try {
       await callSegmentIdentify(phoneNumber, uuid);
       console.log('[Flow] Segment identify event sent successfully');
@@ -64,7 +63,6 @@ app.post('/api/post-otp-events', async (req, res) => {
       // Don't fail the entire flow if identify fails, just log it
     }
 
-    // Step 2: Send track event to Segment
     await callSegmentTrack(submissionPayload, uuid);
     console.log('[Flow] DraftUser -> Segment flow completed successfully');
     return res.status(200).json({ ok: true, uuid });

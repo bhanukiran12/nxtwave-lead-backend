@@ -71,11 +71,9 @@ async function callSegmentTrack(submissionPayload, userId) {
       frontend_form_path_id: 'intensive-english',
       lead_category: formData.lead_category || 'intensive_lead',
       preferred_language: formData.language || 'Telugu',
-      state: formData.state || formData.State || formData.user_state || null,
+      preferred_mode: formData.preferred_mode || formData.preferredMode || formData.mode || null,
       user_preferred_date: formatPreferredDate(formData.selectADateToBookASlot),
-      user_preferred_time: formatPreferredTime(
-        formData.timeSlots || formData.selected_webinar_slot_datetime
-      ),
+      user_preferred_time: formData.timeSlots || formatPreferredTime(formData.selected_webinar_slot_datetime),
       utm_campaign: formData.utm_campaign || null,
       utm_content: formData.utm_content || null,
       utm_medium: formData.utm_medium || null,
