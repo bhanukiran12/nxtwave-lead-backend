@@ -3,7 +3,7 @@ const { URL } = require('url');
 
 const PORT = Number(process.env.PORT || 3001);
 
-const { callDraftUserApi, callSegmentTrack } = require('./api.cjs');
+const { callDraftUserApi, callSegmentTrack, callCRMTrackActivity } = require('./api.cjs');
 
 function json(res, statusCode, body) {
   res.writeHead(statusCode, {
@@ -63,7 +63,10 @@ const server = http.createServer(async (req, res) => {
       }
 
       await callSegmentTrack(submissionPayload, uuid);
-      console.log('[Flow] DraftUser -> Segment flow completed successfully');
+
+      await callCRMTrackActivity(submissionPayload, uuid, phoneNumber);
+
+      console.log('[Flow] DraftUser -> Segment -> CRM flow completed successfully');
       return json(res, 200, { ok: true, uuid });
     } catch (err) {
       console.error('[Flow] Failed:', err);

@@ -34,7 +34,7 @@ app.options('*', cors(corsOptions));
 
 app.use(express.json({ limit: '2mb' }));
 
-const { callDraftUserApi, callSegmentTrack, callSegmentIdentify } = require('./api.cjs');
+const { callDraftUserApi, callSegmentTrack, callSegmentIdentify, callCRMTrackActivity } = require('./api.cjs');
 
 // API route for post-otp-events
 app.post('/api/post-otp-events', async (req, res) => {
@@ -64,7 +64,8 @@ app.post('/api/post-otp-events', async (req, res) => {
     }
 
     await callSegmentTrack(submissionPayload, uuid);
-    console.log('[Flow] DraftUser -> Segment flow completed successfully');
+    await callCRMTrackActivity(submissionPayload, uuid, phoneNumber);
+    console.log('[Flow] DraftUser -> Segment -> CRM flow completed successfully');
     return res.status(200).json({ ok: true, uuid });
   } catch (err) {
     console.error('[Flow] Failed:', err);
