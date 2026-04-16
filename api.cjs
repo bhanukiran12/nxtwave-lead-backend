@@ -96,6 +96,13 @@ function getCRMPreferredMode(preferredMode) {
   return 'Learn from Home (Online)';
 }
 
+function getCRMLeadSource(utmCampaign) {
+  const campaign = String(utmCampaign || '').trim().toLowerCase();
+  if (campaign === 'digitalads') return 'Digital Marketing';
+  if (campaign === 'ifmkt') return 'Influencer Marketing';
+  return 'Organic';
+}
+
 async function callCRMTrackActivity(submissionPayload, uuid, phoneNumber) {
   const formData = submissionPayload?.form_data || {};
   const formId = formData.form_id || submissionPayload?.form_id || '';
@@ -157,7 +164,7 @@ async function callCRMTrackActivity(submissionPayload, uuid, phoneNumber) {
     getFieldObject('ACT_RAC_NATIVE_STATE', nativeState),
     getFieldObject('ACT_RAC_DEM_BKD_SLOT_DATE', demoSlotDate),
     getFieldObject('ACT_RAC_DEM_PREF_TIME_SLOT', demoTimeSlot),
-    getFieldObject('ACT_RAC_LEAD_SOURCE', 'DM Meta Intensive Form'),
+    getFieldObject('ACT_RAC_LEAD_SOURCE', getCRMLeadSource(formData.utm_campaign)),
     getFieldObject('ACT_RAC_TNC', 'True'),
     getFieldObject('activity_datetime', new Date().toISOString().replace('T', ' ').slice(0, 19)),
     getFieldObject('FORM_ID', formId)
