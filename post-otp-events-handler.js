@@ -62,6 +62,14 @@ function toIsoWithIst(datetimeValue) {
   return `${datePart}T${timePart}+05:30`;
 }
 
+function formatCurrentIstDateTime() {
+  const OFFSET_MILLISECONDS = 5.5 * 60 * 60 * 1000;
+  return new Date(Date.now() + OFFSET_MILLISECONDS)
+    .toISOString()
+    .replace('T', ' ')
+    .slice(0, 19);
+}
+
 async function callDraftUserApi(phoneNumber) {
   const innerJson = JSON.stringify({
     phone_number: phoneNumber,
@@ -283,7 +291,7 @@ async function callCRMTrackActivity(submissionPayload, uuid, phoneNumber) {
     getFieldObject('ACT_RAD_DEM_PREF_TIME_SLOT', demoTimeSlot),
     getFieldObject('ACT_RAD_LEAD_SOURCE', getCRMLeadSource(formData.utm_campaign)),
     getFieldObject('ACT_RAD_TNC', 'True'),
-    getFieldObject('activity_datetime', new Date().toISOString().replace('T', ' ').slice(0, 19)),
+    getFieldObject('activity_datetime', formatCurrentIstDateTime()),
     getFieldObject('FORM_ID', formId)
   ];
 

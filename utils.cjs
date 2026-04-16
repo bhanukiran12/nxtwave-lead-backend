@@ -36,9 +36,18 @@ function toIsoWithIst(datetimeValue) {
   return `${datePart}T${timePart}+05:30`;
 }
 
+function formatCurrentIstDateTime() {
+  const OFFSET_MILLISECONDS = 5.5 * 60 * 60 * 1000;
+  return new Date(Date.now() + OFFSET_MILLISECONDS)
+    .toISOString()
+    .replace('T', ' ')
+    .slice(0, 19);
+}
+
 module.exports = {
   getOrdinal,
   formatPreferredDate,
   formatPreferredTime,
-  toIsoWithIst
+  toIsoWithIst,
+  formatCurrentIstDateTime
 };

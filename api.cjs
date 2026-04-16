@@ -9,7 +9,7 @@ const {
   CRM_API_KEY
 } = require('./config.cjs');
 
-const { formatPreferredDate, formatPreferredTime, toIsoWithIst } = require('./utils.cjs');
+const { formatPreferredDate, formatPreferredTime, toIsoWithIst, formatCurrentIstDateTime } = require('./utils.cjs');
 
 async function callDraftUserApi(phoneNumber) {
   const innerJson = JSON.stringify({
@@ -166,7 +166,7 @@ async function callCRMTrackActivity(submissionPayload, uuid, phoneNumber) {
     getFieldObject('ACT_RAC_DEM_PREF_TIME_SLOT', demoTimeSlot),
     getFieldObject('ACT_RAC_LEAD_SOURCE', getCRMLeadSource(formData.utm_campaign)),
     getFieldObject('ACT_RAC_TNC', 'True'),
-    getFieldObject('activity_datetime', new Date().toISOString().replace('T', ' ').slice(0, 19)),
+    getFieldObject('activity_datetime', formatCurrentIstDateTime()),
     getFieldObject('FORM_ID', formId)
   ];
 
