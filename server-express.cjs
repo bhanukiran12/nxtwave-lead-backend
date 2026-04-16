@@ -64,7 +64,10 @@ app.post('/api/post-otp-events', async (req, res) => {
     }
 
     await callSegmentTrack(submissionPayload, uuid);
-    await callCRMTrackActivity(submissionPayload, uuid, phoneNumber);
+    const crmResult = await callCRMTrackActivity(submissionPayload, uuid, phoneNumber);
+    if (crmResult?.skipped) {
+      console.warn('[CRM] CRM call skipped:', crmResult.reason);
+    }
     console.log('[Flow] DraftUser -> Segment -> CRM flow completed successfully');
     return res.status(200).json({ ok: true, uuid });
   } catch (err) {

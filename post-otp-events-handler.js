@@ -204,7 +204,7 @@ function getPhoneDetails(phoneNumber) {
 }
 
 function getFieldObject(fieldName, fieldValue) {
-  return { field_name: fieldName, field_value: fieldValue || '' };
+  return { field_reference_id: fieldName, value: String(fieldValue ?? '') };
 }
 
 function getCRMPreferredMode(preferredMode) {
@@ -217,9 +217,14 @@ async function callCRMTrackActivity(submissionPayload, uuid, phoneNumber) {
   const formData = submissionPayload?.form_data || {};
   const formId = formData.form_id || submissionPayload?.form_id || '';
 
+  if (!formId) {
+    console.warn('[CRM] Skipping CRM call because form_id is missing in the payload');
+    return { skipped: true, reason: 'missing_form_id' };
+  }
+
   if (formId !== 'intensive-demo-form') {
-    console.log('[CRM] Skipping - form_id is not intensive-demo-form:', formId);
-    return;
+    console.warn('[CRM] Skipping CRM call because form_id does not match intensive-demo-form:', formId);
+    return { skipped: true, reason: 'form_id_mismatch', formId };
   }
 
   if (!uuid) {
@@ -255,21 +260,23 @@ async function callCRMTrackActivity(submissionPayload, uuid, phoneNumber) {
   const demoTimeSlot = formData.timeSlots || formData.demoTimeSlot || formData.demo || '';
 
   const activityDetails = [
-    getFieldObject('ACT_RAD_UID', uuid),
-    getFieldObject('ACT_RAD_NAME', name),
+    getFieldObject('ACT_RAC_UID', uuid),
+    getFieldObject('ACT_RAC_NAME', name),
     getFieldObject('ACT_PHONE_NUMBER', JSON.stringify(phoneDetails)),
     getFieldObject('ACT_PREF_LANGUAGE', nativeLanguage),
-    getFieldObject('ACT_RAD_FRNT_END_PATH_ID', frontendPathId),
-    getFieldObject('ACT_RAD_UTM_SOURCE', formData.utm_source || ''),
-    getFieldObject('ACT_RAD_UTM_MEDIUM', formData.utm_medium || ''),
-    getFieldObject('ACT_RAD_UTM_CAMPAIGN', formData.utm_campaign || ''),
-    getFieldObject('ACT_RAD_UTM_CONTENT', formData.utm_content || ''),
+    getFieldObject('ACT_RAC_FRNT_END_PATH_ID', frontendPathId),
+    getFieldObject('ACT_RAC_UTM_SOURCE', formData.utm_source || ''),
+    getFieldObject('ACT_UTM_MEDIUM', formData.utm_medium || ''),
+    getFieldObject('ACT_RAC_UTM_CAMPAIGN', formData.utm_campaign || ''),
+    getFieldObject('ACT_RAC_UTM_CONTENT', formData.utm_content || ''),
     getFieldObject('PREF_MODE_OF_STDY', getCRMPreferredMode(preferredMode)),
-    getFieldObject('ACT_RAD_YOG', yearOfGraduation),
-    getFieldObject('ACT_RAD_NATIVE_STATE', nativeState),
-    getFieldObject('ACT_RAD_DEM_BKD_SLOT_DATE', demoSlotDate),
-    getFieldObject('ACT_RAD_DEM_PREF_TIME_SLOT', demoTimeSlot),
-    getFieldObject('ACT_RAD_LEAD_SOURCE', 'DM Meta Intensive Form'),
+    getFieldObject('ACT_RAC_YOG', yearOfGraduation),
+    getFieldObject('ACT_RAC_NATIVE_STATE', nativeState),
+    getFieldObject('ACT_RAC_DEM_BKD_SLOT_DATE', demoSlotDate),
+    getFieldObject('ACT_RAC_DEM_PREF_TIME_SLOT', demoTimeSlot),
+    getFieldObject('ACT_RAC_LEAD_SOURCE', 'DM Meta Intensive Form'),
+    getFieldObject('ACT_RAC_TNC', 'True'),
+    getFieldObject('activity_datetime', new Date().toISOString().replace('T', ' ').slice(0, 19)),
     getFieldObject('FORM_ID', formId)
   ];
 
@@ -300,7 +307,7 @@ async function callCRMTrackActivity(submissionPayload, uuid, phoneNumber) {
 
   const json = await response.json().catch(() => ({}));
   console.log('[CRM] Track activity success:', json);
-  return json;
+  return { skipped: false, response: json };
 }
 
 export default async function handler(req, res) {
@@ -347,7 +354,10 @@ export default async function handler(req, res) {
     await callSegmentTrack(submissionPayload, uuid);
     console.log('[Flow] DraftUser -> Segment flow completed successfully');
 
-    await callCRMTrackActivity(submissionPayload, uuid, phoneNumber);
+    const crmResult = await callCRMTrackActivity(submissionPayload, uuid, phoneNumber);
+    if (crmResult?.skipped) {
+      console.warn('[CRM] CRM call skipped:', crmResult.reason);
+    }
     console.log('[Flow] CRM track activity completed successfully');
 
     return res.status(200).json({ ok: true, uuid });
