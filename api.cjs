@@ -156,7 +156,7 @@ async function callCRMTrackActivity(submissionPayload, uuid, phoneNumber) {
     getFieldObject('ACT_PREF_LANGUAGE', nativeLanguage),
     getFieldObject('ACT_RAD_FRNT_END_PATH_ID', frontendPathId),
     getFieldObject('ACT_RAD_UTM_SOURCE', formData.utm_source || ''),
-    getFieldObject('ACT_UTM_MEDIUM', formData.utm_medium || ''),
+    getFieldObject('ACT_RAD_UTM_MEDIUM', formData.utm_medium || ''),
     getFieldObject('ACT_RAD_UTM_CAMPAIGN', formData.utm_campaign || ''),
     getFieldObject('ACT_RAD_UTM_CONTENT', formData.utm_content || ''),
     getFieldObject('PREF_MODE_OF_STDY', getCRMPreferredMode(preferredMode)),
