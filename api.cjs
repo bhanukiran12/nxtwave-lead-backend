@@ -207,13 +207,27 @@ async function callSegmentTrack(submissionPayload, userId) {
   if (!userId) {
     throw new Error('UUID is required for Segment tracking');
   }
+let frontendPathId = '';
 
+  try {
+    const frontendUrl = formData.frontend_url || '';
+    if (frontendUrl) {
+      const parsed = new URL(frontendUrl);
+      const path = parsed.pathname.replace(/^\/+|\/+$/g, '');
+      if (path) {
+        frontendPathId = path.split('/')[0].toLowerCase();
+      }
+    }
+  } catch { 
+    console.warn('[CRM] Failed to parse frontend URL for path ID:', formData.frontend_url);
+}
+console.log('[CRM] Extracted frontendPathId:', frontendPathId);
   const body = {
     event: 'Demo Registration Success',
     properties: {
       demo_datetime: toIsoWithIst(formData.selected_webinar_slot_datetime),
       form_id: submissionPayload?.form_id || 'test-demo-form',
-      frontend_form_path_id: 'intensive-english',
+      frontend_form_path_id: frontendPathId,
       lead_category: formData.lead_category || 'intensive_lead',
       preferred_language: formData.language || 'Telugu',
       preferred_mode: formData.preferred_mode || formData.preferredMode || formData.mode || null,

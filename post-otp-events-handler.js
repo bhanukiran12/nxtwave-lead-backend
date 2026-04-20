@@ -117,7 +117,8 @@ async function callDraftUserApi(phoneNumber) {
   console.log('[callDraftUserApi] Returning uuid:', uuid);
   return uuid;
 }
-  let frontendPathId = 'intensive';
+let frontendPathId = '';
+
   try {
     const frontendUrl = formData.frontend_url || '';
     if (frontendUrl) {
@@ -127,7 +128,10 @@ async function callDraftUserApi(phoneNumber) {
         frontendPathId = path.split('/')[0].toLowerCase();
       }
     }
-  } catch {}
+  } catch { 
+    console.warn('[CRM] Failed to parse frontend URL for path ID:', formData.frontend_url);
+}
+console.log('[CRM] Extracted frontendPathId:', frontendPathId);
 async function callSegmentIdentify(phoneNumber, userId) {
   if (!userId) throw new Error('userId is required for Segment identify');
 
