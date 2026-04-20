@@ -14,7 +14,7 @@ const CRM_API_KEY = 'JewJk6ZrbaMWWHuYjSvwOHHdOO4m2s';
 
 // CORS headers
 const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': 'https://nxtwave-lead.netlify.app',
+  'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, x-api-key, Cookie',
   'Access-Control-Max-Age': '86400'
@@ -117,10 +117,11 @@ async function callDraftUserApi(phoneNumber) {
   console.log('[callDraftUserApi] Returning uuid:', uuid);
   return uuid;
 }
-let frontendPathId = '';
 
+function getFrontendPathId(formData) {
+  let frontendPathId = '';
   try {
-    const frontendUrl = formData.frontend_url || '';
+    const frontendUrl = formData?.frontend_url || '';
     if (frontendUrl) {
       const parsed = new URL(frontendUrl);
       const path = parsed.pathname.replace(/^\/+|\/+$/g, '');
@@ -129,9 +130,10 @@ let frontendPathId = '';
       }
     }
   } catch { 
-    console.warn('[CRM] Failed to parse frontend URL for path ID:', formData.frontend_url);
+    console.warn('[CRM] Failed to parse frontend URL for path ID:', formData?.frontend_url);
+  }
+  return frontendPathId;
 }
-console.log('[CRM] Extracted frontendPathId:', frontendPathId);
 async function callSegmentIdentify(phoneNumber, userId) {
   if (!userId) throw new Error('userId is required for Segment identify');
 
@@ -168,7 +170,7 @@ async function callSegmentTrack(submissionPayload, userId) {
     properties: {
       demo_datetime: toIsoWithIst(formData.selected_webinar_slot_datetime),
       form_id: submissionPayload?.form_id || 'test-demo-form',
-      frontend_form_path_id: frontendPathId,
+      frontend_form_path_id: getFrontendPathId(formData),
       lead_category: formData.lead_category || 'intensive_lead',
       preferred_language: formData.language || 'Telugu',
       preferred_mode: formData.preferred_mode || formData.preferredMode || formData.mode || null,
@@ -283,7 +285,7 @@ async function callCRMTrackActivity(submissionPayload, uuid, phoneNumber) {
     getFieldObject('ACT_RAD_NAME', name),
     getFieldObject('ACT_PHONE_NUMBER', JSON.stringify(phoneDetails)),
     getFieldObject('ACT_PREF_LANGUAGE', nativeLanguage),
-    getFieldObject('ACT_RAD_FRNT_END_PATH_ID', frontendPathId),
+    getFieldObject('ACT_RAD_FRNT_END_PATH_ID', getFrontendPathId(formData)),
     getFieldObject('ACT_RAD_UTM_SOURCE', formData.utm_source || ''),
     getFieldObject('ACT_RAD_UTM_MEDIUM', formData.utm_medium || ''),
     getFieldObject('ACT_RAD_UTM_CAMPAIGN', formData.utm_campaign || ''),
