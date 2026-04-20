@@ -117,7 +117,17 @@ async function callDraftUserApi(phoneNumber) {
   console.log('[callDraftUserApi] Returning uuid:', uuid);
   return uuid;
 }
-
+  let frontendPathId = 'intensive';
+  try {
+    const frontendUrl = formData.frontend_url || '';
+    if (frontendUrl) {
+      const parsed = new URL(frontendUrl);
+      const path = parsed.pathname.replace(/^\/+|\/+$/g, '');
+      if (path) {
+        frontendPathId = path.split('/')[0].toLowerCase();
+      }
+    }
+  } catch {}
 async function callSegmentIdentify(phoneNumber, userId) {
   if (!userId) throw new Error('userId is required for Segment identify');
 
@@ -154,7 +164,7 @@ async function callSegmentTrack(submissionPayload, userId) {
     properties: {
       demo_datetime: toIsoWithIst(formData.selected_webinar_slot_datetime),
       form_id: submissionPayload?.form_id || 'test-demo-form',
-      frontend_form_path_id: 'intensive-english',
+      frontend_form_path_id: frontendPathId,
       lead_category: formData.lead_category || 'intensive_lead',
       preferred_language: formData.language || 'Telugu',
       preferred_mode: formData.preferred_mode || formData.preferredMode || formData.mode || null,
@@ -259,17 +269,7 @@ async function callCRMTrackActivity(submissionPayload, uuid, phoneNumber) {
   const nativeLanguage = formData.language || '';
   const nativeState = formData.state || formData.nativeState || formData.currentState || '';
 
-  let frontendPathId = 'intensive';
-  try {
-    const frontendUrl = formData.frontend_url || '';
-    if (frontendUrl) {
-      const parsed = new URL(frontendUrl);
-      const path = parsed.pathname.replace(/^\/+|\/+$/g, '');
-      if (path) {
-        frontendPathId = path.split('/')[0].toLowerCase();
-      }
-    }
-  } catch {}
+
 
   const demoSlotDate = formData.selectADateToBookASlot || formData.demoSlotDate || '';
   const demoTimeSlot = formData.timeSlots || formData.demoTimeSlot || formData.demo || '';
